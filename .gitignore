@@ -1,0 +1,9 @@
+bin/
+obj/
+/packages/
+riderModule.iml
+/_ReSharper.Caches/
+.idea/.idea.MoriEditor/.idea/vcs.xml
+.idea/.idea.MoriEditor/.idea/indexLayout.xml
+.idea/.idea.MoriEditor/.idea/encodings.xml
+.idea/
