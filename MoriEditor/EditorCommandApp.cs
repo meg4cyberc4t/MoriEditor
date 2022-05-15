@@ -13,8 +13,10 @@ public class EditorCommandApp : Command<EditorCommandApp.Settings>
         var fileReader = File.OpenText(filePath);
         var fileText = fileReader.ReadToEnd();
         fileReader.Close();
+        int x = 0, y = 1;
         while (true)
         {
+
             AnsiConsole.Clear();
 
             var path = new TextPath(filePath)
@@ -24,13 +26,24 @@ public class EditorCommandApp : Command<EditorCommandApp.Settings>
                 StemStyle = new Style(Color.Blue),
                 LeafStyle = new Style(Color.Yellow)
             };
-
             AnsiConsole.Write(path);
             AnsiConsole.Write(new Text(fileText));
+            AnsiConsole.Cursor.SetPosition(x + 1, y + 1);
             var keyInfo = Console.ReadKey();
+
+            var column = x - 1;
+            var row = y - 1;
+
+            var buffer = fileText.Split('\n').ToList();
+
             switch (keyInfo.Key)
             {
                 case ConsoleKey.Enter:
+                    if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0)
+                        continue;
+
+                    AnsiConsole.Cursor.SetPosition(0, buffer.Count + 1);
+
                     AnsiConsole.Status()
                         .Start("Saving...", ctx =>
                         {
@@ -46,13 +59,50 @@ public class EditorCommandApp : Command<EditorCommandApp.Settings>
                     return;
                 case ConsoleKey.Backspace:
                     if (fileText.Length == 0) continue;
-                    fileText = fileText.Remove(fileText.Length - 1);
+
+                    buffer[row] = buffer[row].Remove(column, 1);
+                    break;
+
+                case ConsoleKey.Delete:
+                    if (fileText.Length == 0) continue;
+
+                    buffer[row] = buffer[row].Remove(column + 1, 1);
+                    break;
+                case ConsoleKey.UpArrow:
+                    AnsiConsole.Cursor.MoveUp();
+                    break;
+                case ConsoleKey.DownArrow:
+                    AnsiConsole.Cursor.MoveDown();
+                    break;
+                case ConsoleKey.LeftArrow:
+                    AnsiConsole.Cursor.MoveLeft();
+                    break;
+                case ConsoleKey.RightArrow:
+                    AnsiConsole.Cursor.MoveRight();
                     break;
                 default:
+
                     if (!char.IsControl(keyInfo.KeyChar))
-                        fileText += keyInfo.KeyChar;
+                    {
+                        while (buffer.Count <= row)
+                        {
+                            buffer.Add("");
+                        }
+
+                        if (buffer[row].Length <= column)
+                        {
+                            for (int i = 0; i <= column; i++)
+                            {
+                                buffer[row] += " ";
+                            }
+                        }
+                        buffer[row] = buffer[row].Insert(column + 1, keyInfo.KeyChar.ToString());
+                    }
                     break;
             }
+
+            fileText = string.Join('\n', buffer);
+            (x, y) = Console.GetCursorPosition();
         }
     }
 
