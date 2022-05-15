@@ -10,7 +10,16 @@
 //                                              by Igor Molchanov
 
 using MoriEditor;
+using Spectre.Console;
 using Spectre.Console.Cli;
 
-var app = new CommandApp<EditorCommandApp>();
-return app.Run(args);
+try
+{
+    var app = new CommandApp<EditorCommandApp>();
+    return app.Run(args);
+}
+catch (Exception error)
+{
+    AnsiConsole.Write(new Markup($"[red bold]{error.Message}[/]"));
+    return error.HResult;
+}

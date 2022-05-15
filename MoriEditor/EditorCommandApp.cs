@@ -96,7 +96,7 @@ public class EditorCommandApp : Command<EditorCommandApp.Settings>
         {
             DirName = dirName;
             FileName = fileName;
-            LogMode = LogMode;
+            LogMode = logMode;
         }
 
         [CommandOption("-o|--open")]
