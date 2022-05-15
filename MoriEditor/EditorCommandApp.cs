@@ -49,7 +49,8 @@ public class EditorCommandApp : Command<EditorCommandApp.Settings>
                     fileText = fileText.Remove(fileText.Length - 1);
                     break;
                 default:
-                    fileText += keyInfo.KeyChar;
+                    if (!char.IsControl(keyInfo.KeyChar))
+                        fileText += keyInfo.KeyChar;
                     break;
             }
         }
